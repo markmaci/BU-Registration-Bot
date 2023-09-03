@@ -1,0 +1,4 @@
+config.yaml
+class_registration.log
+__pycache__/
+chromedriver_mac_arm64/
