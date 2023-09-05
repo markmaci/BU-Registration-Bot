@@ -193,11 +193,11 @@ def find_course(college, dept, course, section):
 # Replace with your own course.
 # Ex. ('cas','wr','100','a1')
 my_courses = [
-    ("CAS", "CS", "412", "A1"),
-    ("CAS", "CS", "115", "A1"),
-    ("CAS", "CS", "440", "A1"),
-    ("CAS", "CS", "132", "A1"),
-    ("CAS", "CS", "101", "A1"),
+    # ("CAS", "CS", "412", "A1"),
+    # ("CAS", "CS", "115", "A1"),
+    # ("CAS", "CS", "440", "A1"),
+    # ("CAS", "CS", "132", "A1"),
+    ("CAS", "CS", "111", "A1"),
 ]
 
 beginning = time.time()
