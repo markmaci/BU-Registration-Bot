@@ -3,6 +3,8 @@ import re
 from selenium import webdriver
 import time
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import os
 from settings import USERNAME, PASSWORD
 import logging
@@ -30,7 +32,7 @@ Press F12 in chrome, navigate to the Network tab, then go to your planner on stu
 click on the item with a long number, under request headers find "Cookie: .... " 
 Copy the `cookie` header below
 """
-cookies = "f5_cspm=1234; f5avraaaaaaaaaaaaaaaa_session_=DCLLBIFKBDBOCOOOOJLAECMLFEMFPPNCEHKLHKMNCFHNDNKKHJNDMKCJIOCJBOCBIHIDDJIEBKDKPKNPOAAADIAIBCBNEOBFIHHPBDMDJDAMAKFLFMHBHKLPIOJJNLMK; apt.uid=AP-PQQY5YJEHTTA-2-1662922219175-64262784.0.2.be9b9689-258c-45c1-92ed-3c3793cc6b10; ph_foZTeM1AW8dh5WkaofxTYiInBhS4XzTzRqLs50kVziw_posthog=%7B%22distinct_id%22%3A%221890df2852aaa5-0cedc4f762c71c-1d525634-16a7f0-1890df2852b27d9%22%2C%22%24device_id%22%3A%221890df2852aaa5-0cedc4f762c71c-1d525634-16a7f0-1890df2852b27d9%22%2C%22%24user_state%22%3A%22anonymous%22%2C%22extension_version%22%3A%221.5.5%22%2C%22%24session_recording_enabled_server_side%22%3Afalse%2C%22%24autocapture_disabled_server_side%22%3Afalse%2C%22%24active_feature_flags%22%3A%5B%5D%2C%22%24enabled_feature_flags%22%3A%7B%22enable-session-recording%22%3Afalse%2C%22sourcing%22%3Afalse%2C%22only-company-edit%22%3Afalse%2C%22job-lists%22%3Afalse%7D%2C%22%24feature_flag_payloads%22%3A%7B%7D%7D; BIGipServerist-uiscgi-app-prod-443-pool=1288029568.47873.0000; uiscgi_prod=4776fe534809cb6409d8e1593bb08a40:prod; BIGipServerist-uiscgi-content-prod-443-pool=2315708170.47873.0000; BIGipServerist-uiscgi-app-prod-80-pool=1271252352.20480.0000; BIGipServerist-web-legacy-prod-80-pool=1662710026.31745.0000; BIGipServerist-wp-app-prod-443-pool=3475040010.47873.0000"
+cookies = "f5_cspm=1234; f5avraaaaaaaaaaaaaaaa_session_=HNOJJDPHFFBCAKPIGHDFNHEKOEOBDNPJBCHELPFDHPGMDHBPOOBDNHGOHGPMPOHIJGFDNGPCFKMIHIMIMKBABHAAOCOIJDHMGLACKGFBFMNIDOIHPJONBELJLKFKJMEP; apt.uid=AP-PQQY5YJEHTTA-2-1662922219175-64262784.0.2.be9b9689-258c-45c1-92ed-3c3793cc6b10; ph_foZTeM1AW8dh5WkaofxTYiInBhS4XzTzRqLs50kVziw_posthog=%7B%22distinct_id%22%3A%221890df2852aaa5-0cedc4f762c71c-1d525634-16a7f0-1890df2852b27d9%22%2C%22%24device_id%22%3A%221890df2852aaa5-0cedc4f762c71c-1d525634-16a7f0-1890df2852b27d9%22%2C%22%24user_state%22%3A%22anonymous%22%2C%22extension_version%22%3A%221.5.5%22%2C%22%24session_recording_enabled_server_side%22%3Afalse%2C%22%24autocapture_disabled_server_side%22%3Afalse%2C%22%24active_feature_flags%22%3A%5B%5D%2C%22%24enabled_feature_flags%22%3A%7B%22enable-session-recording%22%3Afalse%2C%22sourcing%22%3Afalse%2C%22only-company-edit%22%3Afalse%2C%22job-lists%22%3Afalse%7D%2C%22%24feature_flag_payloads%22%3A%7B%7D%7D; AWSALB=vQeckX9UCdbW00KGv9/TPMsmJESGTze/rkxagcErORtFuZvekB6sEkFviFpsWNE1TOf9SF7AeIg3T/oAdtivYEzZHCfLmUd2VGip7NQNiuepCGckwJEr8ycUXutKBWOxYlF5LKalPI/rCoU7yNqBD9D0MIC9DBHNQi4zzGe1QifkhHj2g3YGSTsAnwIzmw==; AWSALBCORS=vQeckX9UCdbW00KGv9/TPMsmJESGTze/rkxagcErORtFuZvekB6sEkFviFpsWNE1TOf9SF7AeIg3T/oAdtivYEzZHCfLmUd2VGip7NQNiuepCGckwJEr8ycUXutKBWOxYlF5LKalPI/rCoU7yNqBD9D0MIC9DBHNQi4zzGe1QifkhHj2g3YGSTsAnwIzmw==; uiscgi_prod=7866ff5ecaab7c53e6dea8bb76b63402:prod; BIGipServerist-uiscgi-app-prod-443-pool=1271252352.47873.0000; BIGipServerist-uiscgi-app-prod-80-pool=1288029568.20480.0000; BIGipServerist-web-legacy-prod-80-pool=907866378.31745.0000; BIGipServerist-wp-app-prod-443-pool=3542148874.47873.0000; BIGipServerwww-prod-crc-443-pool=1833771789.47873.0000; BIGipServerwww-prod-crc-80-pool=139272973.20480.0000; BIGipServerist-web-legacy-prod-443-pool=1662710026.31745.0000"
 
 
 # You might also have to copy the other headers into here
@@ -49,7 +51,7 @@ def generate_headers():
     }
 
 
-url = "https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1524289373"
+url = "https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1693985675"
 
 
 def generate_params(college, dept, course, section):
@@ -143,11 +145,14 @@ def find_course(college, dept, course, section):
         retry_because_of_timeout = False
         try:
             r = requests.get(url, headers=headers, params=params_browse, timeout=3)
+            # log request
             text = r.text
             logging.info("FIND COURSE REQUEST: %s" % (r.text))
             # logging.info("FIND COURSE REQUEST TEXT: %s" % (text))
         except Exception as e:
+            print(e)
             retry_because_of_timeout = True
+            logging.warning("Exception: %s" % (e))
             pass
 
         if retry_because_of_timeout:
@@ -157,8 +162,9 @@ def find_course(college, dept, course, section):
     ####
 
     p = re.compile("<tr ALIGN=center Valign= top>.+?</td></tr>", re.DOTALL)
+    logging.info("COURSE LIST: %s" % (p))
     m = p.findall(text)
-    logging.info("COURSE LIST: %s" % (m))
+    logging.info("COURSE LIST AFTER findAll: %s" % (m))
     if len(m) == 0:
         print("Something went wrong with the request for " + dept + course)
         login()
@@ -193,11 +199,9 @@ def find_course(college, dept, course, section):
 # Replace with your own course.
 # Ex. ('cas','wr','100','a1')
 my_courses = [
+    ("CAS", "CS", "320", "B1"),
     ("CAS", "CS", "412", "A1"),
     ("CAS", "CS", "115", "A1"),
-    ("CAS", "CS", "440", "A1"),
-    ("CAS", "CS", "132", "A1"),
-    ("CAS", "CS", "101", "A1"),
 ]
 
 beginning = time.time()
